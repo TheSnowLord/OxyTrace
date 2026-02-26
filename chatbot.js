@@ -1,6 +1,6 @@
 // ── OxyTrace AI Chatbot (Gemini) ──────────────────────────────────────────────
 (function () {
-  const GEMINI_API_KEY = window.GEMINI_API_KEY || 'AIzaSyCqXWPBdpaOXVO_0G97TkHxQW6dQnV_tC0';
+  const GEMINI_API_KEY = window.GEMINI_API_KEY || '3c6018c1a469453181efdaa8bae424b0.dfiQs62RCvC5ZeFM';
   const MODEL = 'gemini-2.0-flash';
   const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${GEMINI_API_KEY}`;
 
