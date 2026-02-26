@@ -91,13 +91,13 @@
       }
     }
 
-    function finishSetup() {
+    async function finishSetup() {
       // 1. Gather all data
       const conditions = [];
       document.querySelectorAll('input[type="checkbox"]:checked').forEach(cb => {
         conditions.push(cb.value);
       });
-      
+
       const other = document.getElementById('other-condition').value;
       if(other.trim()) conditions.push(other);
 
@@ -111,11 +111,20 @@
         conditions: conditions
       };
 
-      // 3. Save to LocalStorage (The "Database")
+      // 3. Save to LocalStorage
       localStorage.setItem('oxtrace_health_profile', JSON.stringify(profile));
       localStorage.setItem('oxy_onboarded', 'true');
 
-      // 4. Launch Dashboard
+      // 4. Save to Firebase
+      try {
+        const { saveHealthProfile } = await import('./firebase.js');
+        await saveHealthProfile(profile);
+        console.log('✅ Health profile saved to Firebase');
+      } catch(e) {
+        console.warn('Firebase save failed (continuing anyway):', e.message);
+      }
+
+      // 5. Launch Dashboard
       window.location.href = 'index.html';
     }
   </script>
