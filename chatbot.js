@@ -1,6 +1,6 @@
 // ── OxyTrace AI Chatbot (Gemini) ──────────────────────────────────────────────
 (function () {
-  const GEMINI_API_KEY = window.GEMINI_API_KEY || 'YOUR_API_KEY_HERE';
+  const GEMINI_API_KEY = window.GEMINI_API_KEY || 'AIzaSyDkpsrB4wtd22A6wNzF6o-REVUEj9VX1TQ';
   const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`;
 
   const SYSTEM_PROMPT = `You are OxyBot, a smart assistant built into the OxyTrace air quality app.
