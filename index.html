@@ -111,6 +111,99 @@
     /* ── next-refresh bar ── */
     #next-refresh-bar{height:2px;background:rgba(0,212,255,.15);position:relative;overflow:hidden;}
     #next-refresh-fill{height:100%;background:var(--neon-blue);transition:width 1s linear;width:100%;}
+
+    /* ── Profile Panel ── */
+    #profile-panel{
+      position:fixed;top:0;right:0;bottom:0;
+      width:min(420px,100vw);
+      background:rgba(7,11,15,.97);
+      backdrop-filter:blur(24px);
+      border-left:1px solid rgba(0,212,255,.18);
+      z-index:10000;
+      transform:translateX(100%);
+      transition:transform .4s cubic-bezier(.22,1,.36,1);
+      overflow-y:auto;
+      display:flex;flex-direction:column;
+    }
+    #profile-panel.open{transform:translateX(0);}
+    #profile-overlay{
+      position:fixed;inset:0;background:rgba(0,0,0,0);
+      z-index:9999;pointer-events:none;transition:background .4s;
+    }
+    #profile-overlay.active{background:rgba(0,0,0,.6);pointer-events:all;}
+
+    /* Panel scrollbar */
+    #profile-panel::-webkit-scrollbar{width:4px;}
+    #profile-panel::-webkit-scrollbar-track{background:transparent;}
+    #profile-panel::-webkit-scrollbar-thumb{background:rgba(0,212,255,.2);border-radius:2px;}
+
+    /* Panel inner components */
+    .p-avatar{
+      width:80px;height:80px;border-radius:50%;
+      background:linear-gradient(135deg,rgba(0,212,255,.2),rgba(0,255,136,.15));
+      border:2px solid rgba(0,212,255,.3);
+      display:flex;align-items:center;justify-content:center;
+      font-size:32px;font-weight:700;font-family:'Orbitron',sans-serif;
+      color:var(--neon-blue);text-shadow:0 0 16px rgba(0,212,255,.6);
+      position:relative;
+    }
+    .p-avatar::after{
+      content:'';position:absolute;inset:-4px;border-radius:50%;
+      background:conic-gradient(var(--neon-blue),var(--neon-green),var(--neon-blue));
+      z-index:-1;opacity:.3;animation:p-spin 4s linear infinite;
+    }
+    @keyframes p-spin{to{transform:rotate(360deg);}}
+    .p-info-row{
+      background:rgba(0,212,255,.03);border:1px solid rgba(0,212,255,.1);
+      border-radius:12px;padding:14px 16px;transition:all .2s;
+    }
+    .p-info-row:hover{background:rgba(0,212,255,.06);border-color:rgba(0,212,255,.2);}
+    .p-label{font-size:9px;letter-spacing:.12em;color:rgba(0,212,255,.45);text-transform:uppercase;font-family:'Orbitron',sans-serif;margin-bottom:4px;}
+    .p-value{font-size:13px;color:#e0f4ff;font-weight:500;}
+    .p-stat{
+      background:rgba(0,212,255,.04);border:1px solid rgba(0,212,255,.1);
+      border-radius:12px;padding:12px 8px;text-align:center;transition:all .2s;
+    }
+    .p-stat:hover{transform:translateY(-2px);border-color:rgba(0,212,255,.22);}
+    .p-stat-num{font-size:22px;font-weight:700;font-family:'Orbitron',sans-serif;color:var(--neon-blue);text-shadow:0 0 12px rgba(0,212,255,.4);}
+    .p-stat-lbl{font-size:8px;letter-spacing:.1em;color:rgba(0,212,255,.4);margin-top:2px;text-transform:uppercase;}
+    .p-health-badge{display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:999px;font-size:9px;letter-spacing:.08em;font-weight:600;}
+    .p-badge-low{background:rgba(0,255,136,.12);border:1px solid rgba(0,255,136,.25);color:var(--neon-green);}
+    .p-badge-mod{background:rgba(255,215,0,.12);border:1px solid rgba(255,215,0,.25);color:var(--neon-yellow);}
+    .p-badge-hi{background:rgba(255,107,107,.12);border:1px solid rgba(255,107,107,.25);color:#ff6b6b;}
+    .p-btn{
+      background:linear-gradient(135deg,rgba(0,212,255,.1),rgba(0,255,136,.07));
+      border:1px solid rgba(0,212,255,.28);border-radius:10px;
+      padding:9px 18px;color:var(--neon-blue);
+      font-family:'Orbitron',sans-serif;font-size:10px;font-weight:700;letter-spacing:.12em;
+      cursor:pointer;transition:all .22s;width:100%;
+    }
+    .p-btn:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(0,212,255,.12);border-color:rgba(0,212,255,.5);}
+    .p-btn-danger{background:rgba(255,107,107,.08);border-color:rgba(255,107,107,.25);color:#ff6b6b;}
+    .p-section-lbl{font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:.12em;color:rgba(0,212,255,.5);margin-bottom:10px;text-transform:uppercase;}
+
+    /* Profile edit form */
+    .p-form-input{
+      width:100%;background:rgba(0,212,255,.04);border:1px solid rgba(0,212,255,.15);
+      border-radius:8px;padding:10px 12px;color:#e0f4ff;
+      font-family:'IBM Plex Mono',monospace;font-size:12px;outline:none;transition:all .2s;
+    }
+    .p-form-input:focus{border-color:var(--neon-blue);background:rgba(0,212,255,.07);box-shadow:0 0 0 3px rgba(0,212,255,.07);}
+    .p-form-input::placeholder{color:rgba(0,212,255,.22);}
+    .p-cond-check{
+      display:flex;align-items:center;gap:8px;padding:8px 12px;
+      background:rgba(0,212,255,.03);border:1px solid rgba(0,212,255,.1);
+      border-radius:8px;cursor:pointer;transition:all .18s;font-size:12px;
+    }
+    .p-cond-check:hover{background:rgba(0,212,255,.06);border-color:rgba(0,212,255,.2);}
+    .p-cond-check input{accent-color:var(--neon-blue);width:14px;height:14px;}
+
+    /* Profile icon glow when active */
+    #btn-profile.active-profile{
+      background:rgba(0,212,255,.18) !important;
+      border-color:rgba(0,212,255,.5) !important;
+      box-shadow:0 0 12px rgba(0,212,255,.25);
+    }
   </style>
 </head>
 <body class="pb-20">
@@ -139,12 +232,12 @@
         <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
       </svg>
     </button>
-    <button class="relative w-9 h-9 rounded-full flex items-center justify-center border border-cyan-500/30"
+    <button id="btn-profile" onclick="openProfilePanel()" class="relative w-9 h-9 rounded-full flex items-center justify-center border border-cyan-500/30 transition-all"
       style="background:rgba(0,212,255,.08)">
       <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="#00d4ff" stroke-width="1.5">
         <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke-linecap="round"/>
       </svg>
-      <span class="absolute top-0.5 right-0.5 w-2 h-2 rounded-full" style="background:var(--neon-green)"></span>
+      <span class="absolute top-0.5 right-0.5 w-2 h-2 rounded-full pulse-dot" style="background:var(--neon-green)"></span>
     </button>
   </div>
 </header>
@@ -359,6 +452,141 @@
     <span class="text-xs opacity-40 font-orbitron" style="font-size:9px;letter-spacing:.05em;">Alerts</span>
   </button>
 </nav>
+
+<!-- ══ PROFILE OVERLAY ══ -->
+<div id="profile-overlay" onclick="closeProfilePanel()"></div>
+
+<!-- ══ PROFILE PANEL ══ -->
+<div id="profile-panel">
+  <!-- Panel Header -->
+  <div style="position:sticky;top:0;background:rgba(7,11,15,.97);backdrop-filter:blur(20px);border-bottom:1px solid rgba(0,212,255,.1);padding:16px 20px;display:flex;align-items:center;justify-content:space-between;z-index:10;flex-shrink:0;">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <svg viewBox="0 0 32 32" fill="none" style="width:22px;height:22px;">
+        <circle cx="16" cy="16" r="14" stroke="#00d4ff" stroke-width="1.5" opacity=".4"/>
+        <path d="M10 20 C10 20 10 10 16 10 C22 10 22 20 22 20" stroke="#00d4ff" stroke-width="2" stroke-linecap="round" fill="none"/>
+        <path d="M13 20 C13 20 13 14 16 14 C19 14 19 20 19 20" stroke="#00ff88" stroke-width="2" stroke-linecap="round" fill="none"/>
+        <circle cx="16" cy="10" r="2" fill="#00d4ff" opacity=".8"/>
+      </svg>
+      <span style="font-family:'Orbitron',sans-serif;font-size:13px;font-weight:900;letter-spacing:.15em;color:var(--neon-blue);text-shadow:0 0 10px rgba(0,212,255,.5);">PROFILE</span>
+    </div>
+    <button onclick="closeProfilePanel()" style="width:30px;height:30px;border-radius:50%;background:rgba(0,212,255,.07);border:1px solid rgba(0,212,255,.2);color:rgba(0,212,255,.6);font-size:18px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;" onmouseover="this.style.background='rgba(0,212,255,.13)'" onmouseout="this.style.background='rgba(0,212,255,.07)'">&times;</button>
+  </div>
+
+  <!-- Panel Content -->
+  <div style="padding:20px;flex:1;" id="profile-view">
+
+    <!-- Avatar + Name -->
+    <div style="display:flex;flex-direction:column;align-items:center;padding:24px 0 20px;gap:12px;">
+      <div class="p-avatar" id="p-avatar-circle">
+        <span id="p-avatar-initial">U</span>
+      </div>
+      <div style="text-align:center;">
+        <h2 class="font-orbitron glow-blue" id="p-display-name" style="font-size:20px;font-weight:900;color:var(--neon-blue);margin-bottom:6px;">User</h2>
+        <span class="p-health-badge p-badge-low" id="p-status-badge">
+          <svg style="width:10px;height:10px;" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+          HEALTHY PROFILE
+        </span>
+      </div>
+    </div>
+
+    <!-- User Info -->
+    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px;">
+      <div class="p-info-row">
+        <div class="p-label">Email Address</div>
+        <div class="p-value" id="p-email">user@oxytrace.com</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+        <div class="p-info-row">
+          <div class="p-label">Age</div>
+          <div class="p-value" id="p-age">—</div>
+        </div>
+        <div class="p-info-row">
+          <div class="p-label">Member Since</div>
+          <div class="p-value" id="p-since">Today</div>
+        </div>
+      </div>
+      <div class="p-info-row">
+        <div class="p-label">Health Conditions</div>
+        <div class="p-value" id="p-conditions">No conditions specified</div>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div style="margin-bottom:20px;">
+      <div class="p-section-lbl">YOUR STATS</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
+        <div class="p-stat">
+          <div class="p-stat-num" id="p-days">1</div>
+          <div class="p-stat-lbl">Days Active</div>
+        </div>
+        <div class="p-stat">
+          <div class="p-stat-num" id="p-checks">0</div>
+          <div class="p-stat-lbl">AQI Checks</div>
+        </div>
+        <div class="p-stat">
+          <div class="p-stat-num">95</div>
+          <div class="p-stat-lbl">Health Score</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Settings -->
+    <div style="margin-bottom:20px;">
+      <div class="p-section-lbl">SETTINGS</div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <div class="p-info-row" style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;" onclick="togglePanelNotifications()">
+          <div>
+            <div class="p-value">Push Notifications</div>
+            <div style="font-size:10px;color:rgba(0,212,255,.35);margin-top:2px;">Air quality alerts</div>
+          </div>
+          <div id="p-notif-toggle" style="width:40px;height:22px;border-radius:999px;background:rgba(0,255,136,.2);border:1px solid rgba(0,255,136,.4);position:relative;transition:all .3s;flex-shrink:0;">
+            <div style="width:16px;height:16px;border-radius:50%;background:white;position:absolute;top:2px;right:2px;transition:all .3s;box-shadow:0 2px 4px rgba(0,0,0,.3);"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div style="display:flex;flex-direction:column;gap:8px;">
+      <button class="p-btn" onclick="showPanelEditForm()">✎ &nbsp;EDIT PROFILE</button>
+      <button class="p-btn p-btn-danger" onclick="panelLogout()">⏻ &nbsp;SIGN OUT</button>
+    </div>
+
+  </div>
+
+  <!-- Edit Form (hidden by default) -->
+  <div style="padding:20px;flex:1;display:none;" id="profile-edit-form">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;">
+      <button onclick="hidePanelEditForm()" style="width:28px;height:28px;border-radius:50%;background:rgba(0,212,255,.07);border:1px solid rgba(0,212,255,.2);color:var(--neon-blue);font-size:16px;display:flex;align-items:center;justify-content:center;cursor:pointer;">←</button>
+      <span class="font-orbitron" style="font-size:13px;color:var(--neon-blue);letter-spacing:.1em;">EDIT PROFILE</span>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <div>
+        <div class="p-label" style="margin-bottom:6px;">Full Name</div>
+        <input type="text" id="p-edit-name" class="p-form-input" placeholder="Enter your name">
+      </div>
+      <div>
+        <div class="p-label" style="margin-bottom:6px;">Email Address</div>
+        <input type="email" id="p-edit-email" class="p-form-input" placeholder="your@email.com">
+      </div>
+      <div>
+        <div class="p-label" style="margin-bottom:6px;">Age</div>
+        <input type="number" id="p-edit-age" class="p-form-input" placeholder="Your age" min="1" max="120">
+      </div>
+      <div>
+        <div class="p-label" style="margin-bottom:6px;">Health Conditions</div>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <label class="p-cond-check"><input type="checkbox" value="asthma" class="p-cond-input"> Asthma</label>
+          <label class="p-cond-check"><input type="checkbox" value="copd" class="p-cond-input"> COPD</label>
+          <label class="p-cond-check"><input type="checkbox" value="heart_disease" class="p-cond-input"> Heart Disease</label>
+          <label class="p-cond-check"><input type="checkbox" value="pregnant" class="p-cond-input"> Pregnant</label>
+          <label class="p-cond-check"><input type="checkbox" value="diabetes" class="p-cond-input"> Diabetes</label>
+        </div>
+      </div>
+      <button class="p-btn" onclick="savePanelProfile()" style="margin-top:6px;">✓ &nbsp;SAVE CHANGES</button>
+    </div>
+  </div>
+</div>
 
 <script src="logic.js"></script>
 <script src="api.js"></script>
@@ -598,7 +826,144 @@ window.addEventListener('message', e => {
 // ── Boot ──────────────────────────────────────────────────────────────────────
 window.OxyTraceAPI.init();
 </script>
-    <script>window.GEMINI_API_KEY = 'AIzaSyDkpsrB4wtd22A6wNzF6o-REVUEj9VX1TQ';</script>
-    <script src="chatbot.js"></script>
+<script>window.GEMINI_API_KEY = 'AIzaSyDkpsrB4wtd22A6wNzF6o-REVUEj9VX1TQ';</script>
+<script src="chatbot.js"></script>
 </body>
 </html>
+<script>
+// ══ PROFILE PANEL LOGIC ══════════════════════════════════════════════════════
+
+function openProfilePanel() {
+  loadPanelProfile();
+  document.getElementById('profile-panel').classList.add('open');
+  document.getElementById('profile-overlay').classList.add('active');
+  document.getElementById('btn-profile').classList.add('active-profile');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeProfilePanel() {
+  document.getElementById('profile-panel').classList.remove('open');
+  document.getElementById('profile-overlay').classList.remove('active');
+  document.getElementById('btn-profile').classList.remove('active-profile');
+  document.body.style.overflow = '';
+  hidePanelEditForm();
+}
+
+function loadPanelProfile() {
+  const profile = window.OxyTrace ? window.OxyTrace.getUserProfile() : {};
+  const email = localStorage.getItem('oxy_user_email') || 'user@oxytrace.com';
+  const joinDate = localStorage.getItem('oxy_join_date') || new Date().toISOString();
+  const stats = JSON.parse(localStorage.getItem('oxy_stats') || '{"checks":0,"alerts":0}');
+
+  const name = profile.name || 'User';
+  document.getElementById('p-display-name').textContent = name;
+  document.getElementById('p-avatar-initial').textContent = name[0].toUpperCase();
+  document.getElementById('p-email').textContent = email;
+  document.getElementById('p-age').textContent = profile.age ? profile.age + ' yrs' : '—';
+  document.getElementById('p-checks').textContent = stats.checks || 0;
+
+  const days = Math.max(1, Math.ceil((Date.now() - new Date(joinDate)) / 86400000));
+  document.getElementById('p-days').textContent = days;
+
+  const since = new Date(joinDate);
+  document.getElementById('p-since').textContent = since.toLocaleDateString([], {month:'short', year:'numeric'});
+
+  const condMap = { asthma:'Asthma', copd:'COPD', heart_disease:'Heart Disease', pregnant:'Pregnancy', diabetes:'Diabetes' };
+  if (profile.conditions && profile.conditions.length > 0) {
+    document.getElementById('p-conditions').textContent = profile.conditions.map(c => condMap[c] || c).join(', ');
+    const badge = document.getElementById('p-status-badge');
+    if (profile.conditions.length >= 2) {
+      badge.className = 'p-health-badge p-badge-hi';
+      badge.innerHTML = '<svg style="width:10px;height:10px" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg> HIGH RISK';
+    } else {
+      badge.className = 'p-health-badge p-badge-mod';
+      badge.innerHTML = '<svg style="width:10px;height:10px" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg> MODERATE RISK';
+    }
+  } else {
+    document.getElementById('p-conditions').textContent = 'No conditions specified';
+    document.getElementById('p-status-badge').className = 'p-health-badge p-badge-low';
+    document.getElementById('p-status-badge').innerHTML = '<svg style="width:10px;height:10px" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg> HEALTHY PROFILE';
+  }
+
+  initPanelNotifToggle();
+}
+
+function showPanelEditForm() {
+  const profile = window.OxyTrace ? window.OxyTrace.getUserProfile() : {};
+  const email = localStorage.getItem('oxy_user_email') || '';
+  document.getElementById('p-edit-name').value = profile.name || '';
+  document.getElementById('p-edit-email').value = email;
+  document.getElementById('p-edit-age').value = profile.age || '';
+  document.querySelectorAll('.p-cond-input').forEach(inp => {
+    inp.checked = profile.conditions && profile.conditions.includes(inp.value);
+  });
+  document.getElementById('profile-view').style.display = 'none';
+  document.getElementById('profile-edit-form').style.display = 'block';
+}
+
+function hidePanelEditForm() {
+  const v = document.getElementById('profile-view');
+  const f = document.getElementById('profile-edit-form');
+  if (v) v.style.display = 'block';
+  if (f) f.style.display = 'none';
+}
+
+function savePanelProfile() {
+  const name = document.getElementById('p-edit-name').value.trim();
+  const email = document.getElementById('p-edit-email').value.trim();
+  const age = parseInt(document.getElementById('p-edit-age').value) || 0;
+  const conditions = Array.from(document.querySelectorAll('.p-cond-input:checked')).map(i => i.value);
+  if (!name) { alert('Please enter your name'); return; }
+  const profile = { name, age, conditions };
+  if (window.OxyTrace) window.OxyTrace.saveUserProfile(profile);
+  localStorage.setItem('oxy_user_email', email);
+  if (!localStorage.getItem('oxy_join_date')) localStorage.setItem('oxy_join_date', new Date().toISOString());
+  hidePanelEditForm();
+  loadPanelProfile();
+}
+
+function togglePanelNotifications() {
+  const enabled = localStorage.getItem('oxy_notifications') !== 'false';
+  const toggle = document.getElementById('p-notif-toggle');
+  const dot = toggle.querySelector('div');
+  if (enabled) {
+    localStorage.setItem('oxy_notifications', 'false');
+    toggle.style.background = 'rgba(255,107,107,.2)';
+    toggle.style.borderColor = 'rgba(255,107,107,.4)';
+    dot.style.transform = 'translateX(0)';
+  } else {
+    localStorage.setItem('oxy_notifications', 'true');
+    toggle.style.background = 'rgba(0,255,136,.2)';
+    toggle.style.borderColor = 'rgba(0,255,136,.4)';
+    dot.style.transform = 'translateX(18px)';
+    if ('Notification' in window && Notification.permission === 'default') Notification.requestPermission();
+  }
+}
+
+function initPanelNotifToggle() {
+  const enabled = localStorage.getItem('oxy_notifications') !== 'false';
+  const toggle = document.getElementById('p-notif-toggle');
+  if (!toggle) return;
+  const dot = toggle.querySelector('div');
+  if (enabled) {
+    toggle.style.background = 'rgba(0,255,136,.2)';
+    toggle.style.borderColor = 'rgba(0,255,136,.4)';
+    dot.style.transform = 'translateX(18px)';
+  } else {
+    toggle.style.background = 'rgba(255,107,107,.2)';
+    toggle.style.borderColor = 'rgba(255,107,107,.4)';
+    dot.style.transform = 'translateX(0)';
+  }
+}
+
+function panelLogout() {
+  if (confirm('Are you sure you want to sign out?')) {
+    localStorage.removeItem('oxy_logged_in');
+    window.location.href = 'signup.html';
+  }
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeProfilePanel();
+});
+</script>
