@@ -1,21 +1,29 @@
 // ── OxyTrace AI Chatbot (Gemini) ──────────────────────────────────────────────
 (function () {
   const GEMINI_API_KEY = window.GEMINI_API_KEY || 'AIzaSyDkpsrB4wtd22A6wNzF6o-REVUEj9VX1TQ';
-  const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`;
+  const MODEL = 'gemini-2.0-flash';
+  const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${GEMINI_API_KEY}`;
 
   const SYSTEM_PROMPT = `You are OxyBot, a smart assistant built into the OxyTrace air quality app.
 You help users with:
-- 🌿 Air quality & health: Explain AQI levels, PM2.5, pollutants, and health risks
-- 🧭 Navigation: Help users find safe parks, low-pollution routes, and safe zones
-- 🚨 Alerts: Warn users about dangerous air quality and advise precautions
-- 💡 Tips: Give personalized advice on masks, outdoor timing, indoor air quality
+- Air quality & health: Explain AQI levels, PM2.5, pollutants, and health risks
+- Navigation: Help users find safe parks, low-pollution routes, and safe zones
+- Alerts: Warn users about dangerous air quality and advise precautions
+- Tips: Give personalized advice on masks, outdoor timing, indoor air quality
 
-Always be concise, friendly, and focused on air quality and health. If asked something unrelated, gently redirect to OxyTrace topics.`;
+Always be concise, friendly, and focused on air quality and health topics.
+If asked something unrelated, gently redirect to OxyTrace topics.`;
 
-  let history = [];
+  // System prompt is injected as the opening exchange in history
+  // (more compatible than top-level system_instruction across all API key tiers)
+  let history = [
+    { role: 'user',  parts: [{ text: SYSTEM_PROMPT }] },
+    { role: 'model', parts: [{ text: "Understood! I'm OxyBot, your OxyTrace air quality assistant. I'm ready to help with AQI info, health tips, safe navigation, and pollution alerts." }] }
+  ];
+
   let isOpen = false;
 
-  // ── Build UI ─────────────────────────────────────────────────────────────────
+  // ── Styles ────────────────────────────────────────────────────────────────────
   const styles = `
     #oxy-bubble {
       position: fixed; bottom: 90px; right: 20px; z-index: 10000;
@@ -58,14 +66,13 @@ Always be concise, friendly, and focused on air quality and health. If asked som
     #oxy-close:hover { color: #00d4ff; }
     #oxy-messages {
       flex: 1; overflow-y: auto; padding: 14px; display: flex;
-      flex-direction: column; gap: 10px; min-height: 0;
-      max-height: 360px;
+      flex-direction: column; gap: 10px; min-height: 0; max-height: 360px;
     }
     #oxy-messages::-webkit-scrollbar { width: 4px; }
     #oxy-messages::-webkit-scrollbar-thumb { background: rgba(0,212,255,0.3); border-radius:4px; }
     .oxy-msg {
       max-width: 85%; padding: 10px 13px; border-radius: 12px;
-      font-size: 12px; line-height: 1.55; word-break: break-word;
+      font-size: 12px; line-height: 1.55; word-break: break-word; white-space: pre-wrap;
     }
     .oxy-msg.bot {
       background: rgba(0,212,255,0.08); border: 1px solid rgba(0,212,255,0.15);
@@ -74,6 +81,10 @@ Always be concise, friendly, and focused on air quality and health. If asked som
     .oxy-msg.user {
       background: rgba(0,255,136,0.1); border: 1px solid rgba(0,255,136,0.2);
       color: #b8ffd8; align-self: flex-end; border-radius: 12px 4px 12px 12px;
+    }
+    .oxy-msg.error {
+      background: rgba(255,80,80,0.08); border: 1px solid rgba(255,80,80,0.25);
+      color: #ffaaaa; align-self: flex-start; border-radius: 4px 12px 12px 12px;
     }
     .oxy-typing { display:flex; gap:5px; align-items:center; padding:4px 0; }
     .oxy-typing span {
@@ -135,7 +146,7 @@ Always be concise, friendly, and focused on air quality and health. If asked som
         <button class="oxy-quick" data-q="What does AQI mean?">What is AQI?</button>
         <button class="oxy-quick" data-q="Is it safe to go outside today?">Safe outside?</button>
         <button class="oxy-quick" data-q="Find me a safe park nearby">Safe park</button>
-        <button class="oxy-quick" data-q="What mask should I wear?">Mask tips</button>
+        <button class="oxy-quick" data-q="What mask should I wear for bad air?">Mask tips</button>
       </div>
       <div id="oxy-input-area">
         <textarea id="oxy-input" rows="1" placeholder="Ask about air quality, health, alerts…"></textarea>
@@ -156,14 +167,13 @@ Always be concise, friendly, and focused on air quality and health. If asked som
     isOpen = !isOpen;
     win.classList.toggle('hidden', !isOpen);
     if (isOpen && msgs.children.length === 0) {
-      addBotMsg("👋 Hey! I'm **OxyBot**, your OxyTrace AI assistant.\n\nI can help you with air quality info, health tips, safe navigation, and pollution alerts. What would you like to know?");
+      addMsg("bot", "👋 Hey! I'm OxyBot, your OxyTrace AI assistant.\n\nAsk me about AQI levels, health tips, safe parks, or pollution alerts!");
     }
   }
 
   bubble.addEventListener('click', toggleChat);
   document.getElementById('oxy-close').addEventListener('click', toggleChat);
 
-  // ── Quick buttons ─────────────────────────────────────────────────────────────
   document.querySelectorAll('.oxy-quick').forEach(btn => {
     btn.addEventListener('click', () => {
       input.value = btn.dataset.q;
@@ -171,21 +181,15 @@ Always be concise, friendly, and focused on air quality and health. If asked som
     });
   });
 
-  // ── Messaging ─────────────────────────────────────────────────────────────────
-  function addBotMsg(text) {
+  // ── Message helpers ───────────────────────────────────────────────────────────
+  function addMsg(type, text) {
     const div = document.createElement('div');
-    div.className = 'oxy-msg bot';
-    div.textContent = text.replace(/\*\*(.*?)\*\*/g, '$1'); // strip basic markdown
+    div.className = `oxy-msg ${type}`;
+    // Strip markdown bold/italic for cleaner display
+    div.textContent = text.replace(/\*\*(.*?)\*\*/g, '$1').replace(/\*(.*?)\*/g, '$1');
     msgs.appendChild(div);
     msgs.scrollTop = msgs.scrollHeight;
-  }
-
-  function addUserMsg(text) {
-    const div = document.createElement('div');
-    div.className = 'oxy-msg user';
-    div.textContent = text;
-    msgs.appendChild(div);
-    msgs.scrollTop = msgs.scrollHeight;
+    return div;
   }
 
   function showTyping() {
@@ -202,6 +206,7 @@ Always be concise, friendly, and focused on air quality and health. If asked som
     if (t) t.remove();
   }
 
+  // ── Send ──────────────────────────────────────────────────────────────────────
   async function sendMessage() {
     const text = input.value.trim();
     if (!text) return;
@@ -209,7 +214,7 @@ Always be concise, friendly, and focused on air quality and health. If asked som
     input.style.height = 'auto';
     send.disabled = true;
 
-    addUserMsg(text);
+    addMsg('user', text);
     showTyping();
 
     history.push({ role: 'user', parts: [{ text }] });
@@ -218,23 +223,37 @@ Always be concise, friendly, and focused on air quality and health. If asked som
       const res = await fetch(GEMINI_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          system_instruction: { parts: [{ text: SYSTEM_PROMPT }] },
-          contents: history
-        })
+        body: JSON.stringify({ contents: history })
       });
 
       const data = await res.json();
       removeTyping();
 
-      const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text
-        || "⚠️ Sorry, I couldn't get a response. Please try again.";
+      // Log full response to console for debugging
+      console.log('[OxyBot] API response:', data);
 
-      history.push({ role: 'model', parts: [{ text: reply }] });
-      addBotMsg(reply);
+      if (!res.ok) {
+        // Show the actual API error message
+        const errMsg = data?.error?.message || `API error ${res.status}`;
+        console.error('[OxyBot] API error:', errMsg);
+        addMsg('error', `⚠️ API Error: ${errMsg}`);
+        history.pop(); // Remove the failed message from history
+      } else {
+        const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (reply) {
+          history.push({ role: 'model', parts: [{ text: reply }] });
+          addMsg('bot', reply);
+        } else {
+          console.warn('[OxyBot] Unexpected response shape:', data);
+          addMsg('error', '⚠️ Got an empty response. Please try again.');
+          history.pop();
+        }
+      }
     } catch (err) {
       removeTyping();
-      addBotMsg("⚠️ Connection error. Please check your internet and try again.");
+      console.error('[OxyBot] Network/fetch error:', err);
+      addMsg('error', `⚠️ Network error: ${err.message}`);
+      history.pop();
     }
 
     send.disabled = false;
