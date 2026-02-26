@@ -55,19 +55,33 @@
     </form>
   </div>
 
-  <script>
-    function saveDetails(e) {
+  <script type="module">
+    import { db, auth } from './firebase.js';
+    import { doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    document.querySelector('form').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const name = document.getElementById('name').value;
-      const age = document.getElementById('age').value;
-      
-      // Save locally
+      const name   = document.getElementById('name').value;
+      const age    = document.getElementById('age').value;
+      const gender = document.getElementById('gender').value;
+
+      // Save to localStorage
       localStorage.setItem('oxy_username', name);
       localStorage.setItem('oxy_age', age);
-      
-      // Go to Step 3
+
+      // Save to Firebase
+      try {
+        const user = auth.currentUser;
+        if (user) {
+          await updateDoc(doc(db, 'users', user.uid), { name, age, gender });
+          console.log('✅ Details saved to Firebase');
+        }
+      } catch(e) {
+        console.warn('Firebase update failed:', e.message);
+      }
+
       window.location.href = 'health-survey.html';
-    }
+    });
   </script>
 </body>
 </html>
