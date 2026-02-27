@@ -122,11 +122,71 @@ function sendNotification(title, body) {
   }
 }
 
-const checkAlertStatus = (aqi, riskLevel, message) => {
+const checkAlertStatus = async (aqi, riskLevel, message) => {
   if (typeof window === 'undefined' || !('Notification' in window)) return;
   if (aqi <= 100) return;
+
+  // 1. Send push notification
   sendNotification(`OxyTrace: ${riskLevel} Air Quality Alert`, message);
+
+  // 2. Save alert to Firestore
+  try {
+    const { initializeApp, getApps } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
+    const { getFirestore, collection, addDoc, serverTimestamp } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    const { getAuth } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAvDsel_ZqQrqtCuMKBTDqQFVM_zP7VplQ",
+      authDomain: "oxytrace-b1010.firebaseapp.com",
+      projectId: "oxytrace-b1010",
+      storageBucket: "oxytrace-b1010.firebasestorage.app",
+      messagingSenderId: "535755454947",
+      appId: "1:535755454947:web:024254448bbf50061848d6"
+    };
+
+    const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
+    const db   = getFirestore(app);
+    const auth = getAuth(app);
+    const user = auth.currentUser;
+
+    const alertData = {
+      aqi,
+      riskLevel,
+      message,
+      timestamp: serverTimestamp(),
+      location: localStorage.getItem('oxtrace_last_loc') || 'Unknown'
+    };
+
+    if (user) {
+      // Logged in — save under user's profile
+      await addDoc(collection(db, 'users', user.uid, 'alerts'), alertData);
+    } else {
+      // Not logged in — save to global alerts collection
+      await addDoc(collection(db, 'alerts'), alertData);
+    }
+
+    console.log('✅ Alert saved to Firebase');
+  } catch (err) {
+    console.warn('Firebase alert save failed:', err.message);
+  }
 };
+```
+
+---
+
+### Where to see it in Firebase after:
+
+**Firestore → Data tab:**
+```
+users/
+└── {userId}/
+    └── alerts/          ← new collection
+        └── {alertId}/
+            ├── aqi: 145
+            ├── riskLevel: "High"
+            ├── message: "⚠️ UNHEALTHY: Skip the run..."
+            ├── location: "Nagpur, Maharashtra"
+            └── timestamp: Feb 27, 2026
 
 const getUserProfile = () => {
   try {
