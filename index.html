@@ -380,7 +380,7 @@
       </a>
     </div>
     <div class="rounded-2xl overflow-hidden" style="height:260px;position:relative;">
-      <iframe id="map-iframe" src="map.html"
+      <iframe id="map-iframe" src="map.html?minimap=1"
         style="width:100%;height:100%;border:none;display:block;border-radius:16px;"
         allow="geolocation" loading="lazy"></iframe>
       <div style="position:absolute;inset:0;border-radius:16px;border:1px solid rgba(0,212,255,.22);pointer-events:none;z-index:2;"></div>
@@ -397,7 +397,7 @@
     </div>
   </section>
 
-  <section id="alert-feed-section" class="mb-4 section-animate d5" style="display:none;">
+  <section id="alert-feed-section" class="mb-4 section-animate d5">
     <div class="flex items-center justify-between mb-3">
       <h2 class="font-orbitron text-xs tracking-widest opacity-50 uppercase">Health Alerts</h2>
       <span id="alert-badge-label" class="font-orbitron text-xs px-2 py-0.5 rounded-full"
@@ -421,7 +421,7 @@
 </main>
 
 <nav class="bottom-nav fixed bottom-0 left-0 right-0 flex items-center justify-around py-2 px-2 z-50">
-  <button id="nav-home" onclick="showHome()" class="nav-btn active flex flex-col items-center gap-1 px-3 py-2 rounded-xl" style="background:rgba(0,212,255,.08)">
+  <button class="nav-btn active flex flex-col items-center gap-1 px-3 py-2 rounded-xl" style="background:rgba(0,212,255,.08)">
     <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="#00d4ff" stroke-width="1.8">
       <path stroke-linecap="round" stroke-linejoin="round" d="M3 9.75L12 3l9 6.75V21a1 1 0 01-1 1H4a1 1 0 01-1-1V9.75z"/>
       <path stroke-linecap="round" stroke-linejoin="round" d="M9 22V12h6v10"/>
@@ -441,7 +441,7 @@
     </svg>
     <span class="text-xs opacity-40 font-orbitron" style="font-size:9px;letter-spacing:.05em;">Health</span>
   </a>
-  <button id="nav-alerts" onclick="showAlerts()" class="nav-btn flex flex-col items-center gap-1 px-3 py-2 rounded-xl relative">
+  <button class="nav-btn flex flex-col items-center gap-1 px-3 py-2 rounded-xl relative">
     <div class="relative">
       <svg class="w-5 h-5 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
         <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
@@ -493,7 +493,7 @@
     <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px;">
       <div class="p-info-row">
         <div class="p-label">Email Address</div>
-        <div class="p-value" id="p-email">user@oxytrace.com</div>
+        <div class="p-value" id="p-email"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="4035332532002f383934322123256e232f2d">[email&#160;protected]</a></div>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
         <div class="p-info-row">
@@ -588,7 +588,7 @@
   </div>
 </div>
 
-<script src="logic.js"></script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="logic.js"></script>
 <script src="api.js"></script>
 <script src="personalization.js"></script>
 <script>
@@ -826,50 +826,8 @@ window.addEventListener('message', e => {
 // ── Boot ──────────────────────────────────────────────────────────────────────
 window.OxyTraceAPI.init();
 </script>
-<script>window.GEMINI_API_KEY = '3c6018c1a469453181efdaa8bae424b0.dfiQs62RCvC5ZeFM';</script>
+<script>window.GEMINI_API_KEY = 'YOUR_GEMINI_API_KEY';</script>
 <script src="chatbot.js"></script>
-
-<script>
-// ── Alerts / Home tab switcher ────────────────────────────────────────────────
-function showAlerts() {
-  // Hide all main sections except alerts
-  document.querySelectorAll('main > section, main > div').forEach(el => {
-    if (el.id !== 'alert-feed-section') el.style.display = 'none';
-  });
-  document.getElementById('alert-feed-section').style.display = 'block';
-  window.scrollTo(0, 0);
-
-  // Nav styles
-  const nh = document.getElementById('nav-home');
-  const na = document.getElementById('nav-alerts');
-  nh.classList.remove('active'); nh.style.background = '';
-  na.classList.add('active');    na.style.background = 'rgba(255,68,68,.08)';
-  na.querySelector('svg').style.opacity = '1';
-  na.querySelector('svg').style.stroke = '#ff4444';
-  na.querySelector('span').style.color = '#ff4444';
-  na.querySelector('span').style.opacity = '1';
-}
-
-function showHome() {
-  // Show all main sections except alerts
-  document.querySelectorAll('main > section, main > div').forEach(el => {
-    if (el.id !== 'alert-feed-section') el.style.display = '';
-  });
-  document.getElementById('alert-feed-section').style.display = 'none';
-  window.scrollTo(0, 0);
-
-  // Nav styles
-  const nh = document.getElementById('nav-home');
-  const na = document.getElementById('nav-alerts');
-  na.classList.remove('active'); na.style.background = '';
-  na.querySelector('svg').style.opacity = '0.5';
-  na.querySelector('svg').style.stroke = 'currentColor';
-  na.querySelector('span').style.color = '';
-  na.querySelector('span').style.opacity = '0.4';
-  nh.classList.add('active'); nh.style.background = 'rgba(0,212,255,.08)';
-}
-</script>
-
 </body>
 </html>
 <script>
@@ -999,13 +957,4 @@ function initPanelNotifToggle() {
 }
 
 function panelLogout() {
-  if (confirm('Are you sure you want to sign out?')) {
-    localStorage.removeItem('oxy_logged_in');
-    window.location.href = 'signup.html';
-  }
-}
-
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') closeProfilePanel();
-});
-</script>
+  if (confirm('Are you sure
