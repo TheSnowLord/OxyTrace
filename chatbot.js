@@ -1,6 +1,11 @@
 // ── OxyTrace AI Chatbot (Gemini) ──────────────────────────────────────────────
 (function () {
-  const GEMINI_API_KEY = window.GEMINI_API_KEY || '3c6018c1a469453181efdaa8bae424b0.dfiQs62RCvC5ZeFM';
+  // ── Hide chatbot entirely when running inside the minimap iframe ──────────────
+  const isMinimap = window.self !== window.top ||
+    new URLSearchParams(window.location.search).get('minimap') === '1';
+  if (isMinimap) return; // ← exit early; don't inject chatbot in minimap at all
+
+  const GEMINI_API_KEY = window.GEMINI_API_KEY || 'AIzaSyB4uYM4HLvso1-km90MlktcZVl1Y6s0Kas';
   const MODEL = 'gemini-2.0-flash';
   const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${GEMINI_API_KEY}`;
 
